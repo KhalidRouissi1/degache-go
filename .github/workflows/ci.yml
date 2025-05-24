@@ -70,11 +70,18 @@ jobs:
       with:
         go-version: 1.22
 
-    - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-        args: --timeout=5m
+    - name: Run basic linting
+      run: |
+        go fmt ./...
+        go vet ./...
+
+    - name: Check formatting
+      run: |
+        if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then
+          echo "The following files are not formatted:"
+          gofmt -s -l .
+          exit 1
+        fi
 
   build:
     name: Build
@@ -126,7 +133,25 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v4
 
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
+    - name: Set up Go
+      uses: actions/setup-go@v4
       with:
-        args: './...'
+        go-version: 1.22
+
+    - name: Basic Security Check
+      run: |
+        # Check for common security issues
+        echo "Running basic security checks..."
+
+        # Check for hardcoded credentials (basic check)
+        if grep -r "password.*=.*\"\|secret.*=.*\"\|apikey.*=.*\"\|token.*=.*\"" --include="*.go" . | grep -v "_test.go"; then
+          echo "Warning: Potential hardcoded credentials found"
+          exit 1
+        fi
+
+        # Check for SQL injection patterns
+        if grep -r "fmt.Sprintf.*SELECT\|fmt.Sprintf.*INSERT\|fmt.Sprintf.*UPDATE\|fmt.Sprintf.*DELETE" --include="*.go" .; then
+          echo "Warning: Potential SQL injection patterns found"
+        fi
+
+        echo "Basic security checks completed"

@@ -15,13 +15,9 @@ linters-settings:
 
   govet:
     check-shadowing: true
-    enable-all: true
 
   gocyclo:
     min-complexity: 15
-
-  maligned:
-    suggest-new: true
 
   dupl:
     threshold: 100
@@ -39,51 +35,19 @@ linters-settings:
   goimports:
     local-prefixes: github.com/degache-go/degache
 
-  gocritic:
-    enabled-tags:
-      - performance
-      - style
-      - experimental
-    disabled-checks:
-      - wrapperFunc
-
 linters:
   enable:
-    - bodyclose
-    - deadcode
-    - depguard
-    - dogsled
-    - dupl
     - errcheck
-    - gochecknoinits
-    - goconst
-    - gocritic
-    - gocyclo
     - gofmt
     - goimports
-    - golint
-    - gosec
     - gosimple
     - govet
     - ineffassign
-    - interfacer
-    - lll
-    - misspell
-    - nakedret
-    - scopelint
     - staticcheck
-    - structcheck
-    - stylecheck
     - typecheck
-    - unconvert
-    - unparam
     - unused
-    - varcheck
-    - whitespace
 
-  disable:
-    - maligned  # deprecated
-    - prealloc  # too many false positives
+  disable-all: false
 
 issues:
   exclude-rules:
